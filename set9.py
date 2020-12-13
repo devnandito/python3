@@ -1,6 +1,6 @@
 # coding=utf-8
 
-import pandas as pd, sqlite3
+import pandas as pd, sqlite3, os, sys
 from datetime import datetime, timedelta
 
 if __name__ == '__main__':
@@ -11,12 +11,23 @@ if __name__ == '__main__':
     isecond = now.second
     start = timedelta(hours=ihour, minutes=iminute, seconds=isecond)
 
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
     while True:
-
         fopen = input('Enter file:')
-        if fopen == 'quit': break
-
+        if fopen == 'quit': 
+            break
         elif fopen == 'start':
+            filename0 = os.path.join(BASE_DIR, 'python/vlog.txt')
+            f = open(filename0, "r")
+            f1 = f.readlines()
+            list1 = []
+            for x in f1:
+                list1.append(x)
+            count = int(list1[0])
+            fname = list1[1]
+            f.close()
+
             conn = sqlite3.connect('/mnt/d/pytyvo2/setall.sqlite')
 
             cur = conn.cursor()
@@ -28,8 +39,10 @@ if __name__ == '__main__':
                 activity AS ACTIVIDAD
                 FROM allemail WHERE count > 1 ORDER BY ruc
             ''', conn)
-
-            writer = pd.ExcelWriter('allemail.xlsx', engine='xlsxwriter')
+            xfile = os.path.join(BASE_DIR, 'python/results/')
+            xlsx = '.xlsx'
+            xname = xfile+list1[1].rstrip('\n')+list1[0].rstrip('\n')+xlsx
+            writer = pd.ExcelWriter(xname, engine='xlsxwriter')
 
             df.to_excel(writer, sheet_name='Sheet1', startrow=2, index=False, header=False)
             # df.to_excel(writer, sheet_name='Sheet1', startrow=1, index=False, header=False, columns=['PK', 'FK', 'TITLE'], startcol=0)
@@ -88,3 +101,17 @@ if __name__ == '__main__':
                     Time finish: {}
                     '''.format(start, timerun, end)
             print(message)
+
+            count += 1
+            f = open(filename0, 'w')
+            f.write(str(count)+'\n')
+            f.write(str(list1[1]))
+            f.close()
+
+            ext1 = '.txt'
+            logFile = '%s%s%s'%(list1[1].rstrip('\n'),list1[0].rstrip('\n'),ext1)
+            filename1 = os.path.join(BASE_DIR, 'python/logs/'+logFile)
+            f = open(filename1, 'w')
+            f.write(str(message))
+            f.close
+            print(xname)
