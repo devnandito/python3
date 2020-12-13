@@ -14,10 +14,11 @@ if __name__ == '__main__':
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     while True:
-        fopen = input('Enter file:')
+        fopen = input('Enter options [start/quit]:')
         if fopen == 'quit': 
             break
         elif fopen == 'start':
+            xlsxname = input('Enter file name:')
             filename0 = os.path.join(BASE_DIR, 'python/vlog.txt')
             f = open(filename0, "r")
             f1 = f.readlines()
@@ -37,11 +38,13 @@ if __name__ == '__main__':
                 document AS CEDULA,
                 fullname AS NOMBRE,
                 activity AS ACTIVIDAD
-                FROM allemail WHERE count > 1 ORDER BY ruc
+                FROM allemail ORDER BY ruc
             ''', conn)
+
             xfile = os.path.join(BASE_DIR, 'python/results/')
             xlsx = '.xlsx'
-            xname = xfile+list1[1].rstrip('\n')+list1[0].rstrip('\n')+xlsx
+            # xname = xfile+list1[1].rstrip('\n')+list1[0].rstrip('\n')+xlsx
+            xname = xfile+xlsxname+xlsx
             writer = pd.ExcelWriter(xname, engine='xlsxwriter')
 
             df.to_excel(writer, sheet_name='Sheet1', startrow=2, index=False, header=False)
@@ -114,4 +117,3 @@ if __name__ == '__main__':
             f = open(filename1, 'w')
             f.write(str(message))
             f.close
-            print(xname)
